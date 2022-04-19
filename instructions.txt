@@ -1,0 +1,34 @@
+Dockerfile for math server:
+
+	build http-server: docker build --target http-server .
+	run http-server: docker run -d -p 65433:65433 <image id>
+
+	build socket-server: docker build --target socket-server .
+	run socket-server: docker run -d -p 65432:65432 <image id>
+
+Docker-compose for math server + tests(integrational and unit):
+	docker-compose up --build -d
+
+	Communication with servers
+
+		to http-server: 
+					get all: localhost:65433/filter/
+					
+					get filtered operations: localhost:65433/filter/<operation>
+			  		(possible params offset and limit)
+	
+					calculate: localhost:65433/add?n1=2&n2=6.43
+	
+		to socket-server: 
+					calculate: socket-client.py <operation> <number1> <number2>
+
+Test Alembic:
+	docker-compose -f test_migrations.yml up --build -d
+
+
+	
+					
+				 
+
+
+

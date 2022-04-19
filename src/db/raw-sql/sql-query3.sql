@@ -1,0 +1,1 @@
+SELECT name, COUNT(*) FROM operations GROUP BY name

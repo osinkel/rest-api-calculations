@@ -1,0 +1,1 @@
+SELECT name, COUNT(*)*100/(SELECT COUNT(*) FROM operations) FROM operations GROUP BY name

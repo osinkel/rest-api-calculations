@@ -1,0 +1,66 @@
+version: '3'
+
+services:
+  migrations:
+    build:
+      context: .
+      target: alembic
+    depends_on:
+      - http-server
+      - socket-server
+    env_file:
+      - .env
+    entrypoint: ["python", "-m", "alembic", "upgrade", "head"]
+  http-server:
+    container_name: http-server
+    build:
+      context: .
+      target: http-server
+    depends_on:
+      - db
+    env_file:
+      - .env
+    ports:
+      - 65433:65433
+  socket-server:
+    container_name: socket-server
+    build:
+      context: .
+      target: socket-server
+    depends_on:
+      - db
+    env_file:
+      - .env
+    ports:
+      - 65432:65432
+  db:
+    container_name: postgres
+    image: postgres
+    env_file:
+      - .env
+    ports:
+      - 5432:5432
+  unit-tests:
+    build:
+      context: .
+      target: unit-tests
+    depends_on:
+      - migrations
+  integr-tests:
+    build:
+      context: .
+      target: integr-tests
+    depends_on:
+      - unit-tests
+    environment:
+      - HOST=http-server
+      - CLIENT_HOST=socket-server
+      - SOCKET_PORT=65432
+      - HTTP_PORT=65433
+  migrations-tests:
+    build:
+      context: .
+      target: alembic-tests
+    depends_on:
+      - integr-tests
+    entrypoint: ["python", "-m", "pytest", "tests.py"]
